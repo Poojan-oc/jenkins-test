@@ -4,12 +4,12 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Building the application...'
+                sh 'echo "Compiling source code..."'
             }
         }
         stage('Test') {
             steps {
-                echo 'Testing the application...'
+                sh './hello-world.sh'
             }
         }
         stage('Deploy') {
