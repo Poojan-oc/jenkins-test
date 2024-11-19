@@ -2,22 +2,22 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "react-frontend"
-        CONTAINER_NAME = "react-frontend"
-        APP_PORT = "3000" // React app port
+        IMAGE_NAME = 'html-frontend'
+        CONTAINER_NAME = 'html-frontend-container'
+        HOST_PORT = '8081' // Host port for the application
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                echo 'Pulling code from Git repository...'
+                echo 'Pulling code from Git...'
                 checkout scm
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building the Docker image...'
+                echo 'Building Docker image...'
                 sh """
                 docker build -t ${IMAGE_NAME} .
                 """
@@ -26,11 +26,9 @@ pipeline {
 
         stage('Run Docker Container') {
             steps {
-                echo 'Running the Docker container...'
+                echo 'Running Docker container...'
                 sh """
-                docker stop ${CONTAINER_NAME} || true
-                docker rm ${CONTAINER_NAME} || true
-                docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:${APP_PORT} ${IMAGE_NAME}
+                docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:80 ${IMAGE_NAME}
                 """
             }
         }
@@ -38,17 +36,17 @@ pipeline {
 
     post {
         always {
-            echo 'Cleaning up old containers...'
+            echo 'Cleaning up previous containers...'
             sh """
             docker stop ${CONTAINER_NAME} || true
             docker rm ${CONTAINER_NAME} || true
             """
         }
         success {
-            echo 'Pipeline executed successfully. React app is running on port ${APP_PORT}.'
+            echo 'Frontend app deployed successfully!'
         }
         failure {
-            echo 'Pipeline failed.'
+            echo 'Pipeline failed. Check logs for errors.'
         }
     }
 }
