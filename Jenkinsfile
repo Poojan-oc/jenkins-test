@@ -8,6 +8,16 @@ pipeline {
     }
 
     stages {
+        stage('Cleanup Existing Container') {
+            steps {
+                echo 'Removing any existing container with the same name...'
+                sh """
+                docker stop ${CONTAINER_NAME} || true
+                docker rm ${CONTAINER_NAME} || true
+                """
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 echo 'Pulling code from Git...'
@@ -35,13 +45,6 @@ pipeline {
     }
 
     post {
-        always {
-            echo 'Cleaning up previous containers...'
-            sh """
-            docker stop ${CONTAINER_NAME} || true
-            docker rm ${CONTAINER_NAME} || true
-            """
-        }
         success {
             echo 'Frontend app deployed successfully!'
         }
